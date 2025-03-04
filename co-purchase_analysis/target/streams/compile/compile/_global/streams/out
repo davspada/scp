@@ -1,7 +1,0 @@
-[0m[[0m[31merror[0m] [0m[0m/home/davspada/uni/scp/co-purchase_analysis/src/main/scala/Main.scala:36:20: missing parameter type for expanded function ((x$1: <error>, x$2) => x$1.$plus(x$2))[0m
-[0m[[0m[31merror[0m] [0m[0m      .reduceByKey(_ + _, numPartitions) // Aggrega direttamente durante lo shuffle[0m
-[0m[[0m[31merror[0m] [0m[0m                   ^[0m
-[0m[[0m[31merror[0m] [0m[0m/home/davspada/uni/scp/co-purchase_analysis/src/main/scala/Main.scala:36:24: missing parameter type for expanded function ((x$1: <error>, x$2: <error>) => x$1.$plus(x$2))[0m
-[0m[[0m[31merror[0m] [0m[0m      .reduceByKey(_ + _, numPartitions) // Aggrega direttamente durante lo shuffle[0m
-[0m[[0m[31merror[0m] [0m[0m                       ^[0m
-[0m[[0m[31merror[0m] [0m[0mtwo errors found[0m
