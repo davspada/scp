@@ -55,6 +55,7 @@ object Main {
     // **7. Salvataggio senza coalesce, Spark gestirà automaticamente la scrittura su più file**
     coPurchaseCounts
       .map { case ((p1, p2), count) => s"$p1,$p2,$count" }
+      .repartition(1)
       .saveAsTextFile(outputFile)
 
     spark.stop()
