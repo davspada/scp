@@ -14,20 +14,33 @@ gsutil -m rm -r "$OUTPUT" 2>/dev/null
 NUM_WORKERS=$(gcloud dataproc clusters describe $CLUSTER_NAME --region=$REGION --format="value(config.workerConfig.numInstances)")
 echo "NUM_WORKERS is: '$NUM_WORKERS'"
 
+# Set sensible defaults
 EXECUTOR_CORES=4
-EXECUTOR_MEMORY=4g
+EXECUTOR_MEMORY=6g
+MAX_PARTITIONS=64
 
 if [ -z "$NUM_WORKERS" ] || [ "$NUM_WORKERS" = "0" ]; then
+  # Single-node cluster
+  PARTITIONS=3
+  EXECUTOR_CORES=2
+  EXECUTOR_MEMORY=4g
+  DRIVER_MEMORY=4g
   echo "Submitting Spark job in single-node mode (master only)..."
   gcloud dataproc jobs submit spark \
     --cluster=$CLUSTER_NAME \
     --region=$REGION \
     --class=Main \
     --jars=$JAR_NAME \
-    --properties=spark.executor.instances=1,spark.executor.cores=2,spark.executor.memory=3g \
-    -- $DATASET $OUTPUT
-    # ,spark.driver.memory=3g
+    --properties=spark.executor.instances=1,spark.executor.cores=4,spark.executor.memory=6g,spark.driver.memory=4g \
+    -- $DATASET $OUTPUT $PARTITIONS
+    
+    
 else
+  # Multi-node cluster
+  PARTITIONS=$(($NUM_WORKERS * $EXECUTOR_CORES * 3))
+  if [ $PARTITIONS -gt $MAX_PARTITIONS ]; then
+    PARTITIONS=$MAX_PARTITIONS
+  fi
   echo "Submitting Spark job for multi-worker cluster ($NUM_WORKERS workers)..."
   gcloud dataproc jobs submit spark \
     --cluster=$CLUSTER_NAME \
@@ -35,5 +48,5 @@ else
     --class=Main \
     --jars=$JAR_NAME \
     --properties=spark.executor.instances=$NUM_WORKERS,spark.executor.cores=$EXECUTOR_CORES,spark.executor.memory=$EXECUTOR_MEMORY \
-    -- $DATASET $OUTPUT
+    -- $DATASET $OUTPUT $PARTITIONS
 fi
